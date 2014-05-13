@@ -1,0 +1,111 @@
+diff -ruN src_ori/http/ngx_http_upstream.c src/http/ngx_http_upstream.c
+--- src_ori/http/ngx_http_upstream.c	2009-11-16 17:09:51.000000000 +0800
++++ src/http/ngx_http_upstream.c	2009-11-16 15:09:21.000000000 +0800
+@@ -3842,6 +3842,8 @@
+                                          |NGX_HTTP_UPSTREAM_WEIGHT
+                                          |NGX_HTTP_UPSTREAM_MAX_FAILS
+                                          |NGX_HTTP_UPSTREAM_FAIL_TIMEOUT
++                                         |NGX_HTTP_UPSTREAM_SRUN_ID
++                                         |NGX_HTTP_UPSTREAM_MAX_BUSY
+                                          |NGX_HTTP_UPSTREAM_DOWN
+                                          |NGX_HTTP_UPSTREAM_BACKUP);
+     if (uscf == NULL) {
+@@ -3933,9 +3935,9 @@
+     ngx_http_upstream_srv_conf_t  *uscf = conf;
+ 
+     time_t                       fail_timeout;
+-    ngx_str_t                   *value, s;
++    ngx_str_t                   *value, s, id;
+     ngx_url_t                    u;
+-    ngx_int_t                    weight, max_fails;
++    ngx_int_t                    weight, max_fails, max_busy;
+     ngx_uint_t                   i;
+     ngx_http_upstream_server_t  *us;
+ 
+@@ -3972,7 +3974,10 @@
+ 
+     weight = 1;
+     max_fails = 1;
++    max_busy = 0;
+     fail_timeout = 10;
++    id.data = (u_char *) "a";
++    id.len = sizeof("a") - 1;
+ 
+     for (i = 2; i < cf->args->nelts; i++) {
+ 
+@@ -4006,6 +4011,21 @@
+             continue;
+         }
+ 
++        if (ngx_strncmp(value[i].data, "max_busy=", 9) == 0) {
++
++            if (!(uscf->flags & NGX_HTTP_UPSTREAM_MAX_BUSY)) {
++                goto invalid;
++            }
++
++            max_busy = ngx_atoi(&value[i].data[9], value[i].len - 9);
++
++            if (max_busy == NGX_ERROR) {
++                goto invalid;
++            }
++
++            continue;
++        }
++
+         if (ngx_strncmp(value[i].data, "fail_timeout=", 13) == 0) {
+ 
+             if (!(uscf->flags & NGX_HTTP_UPSTREAM_FAIL_TIMEOUT)) {
+@@ -4024,6 +4044,22 @@
+             continue;
+         }
+ 
++        if (ngx_strncmp(value[i].data, "srun_id=", 8) == 0) {
++
++            if (!(uscf->flags & NGX_HTTP_UPSTREAM_SRUN_ID)) {
++                goto invalid;
++            }
++
++            id.len = value[i].len - 8;
++            id.data = &value[i].data[8];
++
++            if (id.len == 0) {
++                goto invalid;
++            }
++
++            continue;
++        }
++
+         if (ngx_strncmp(value[i].data, "backup", 6) == 0) {
+ 
+             if (!(uscf->flags & NGX_HTTP_UPSTREAM_BACKUP)) {
+@@ -4053,7 +4089,9 @@
+     us->naddrs = u.naddrs;
+     us->weight = weight;
+     us->max_fails = max_fails;
++    us->max_busy = max_busy;
+     us->fail_timeout = fail_timeout;
++    us->srun_id = id;
+ 
+     return NGX_CONF_OK;
+ 
+diff -ruN src_ori/http/ngx_http_upstream.h src/http/ngx_http_upstream.h
+--- src_ori/http/ngx_http_upstream.h	2009-11-16 17:09:51.000000000 +0800
++++ src/http/ngx_http_upstream.h	2009-11-16 14:59:09.000000000 +0800
+@@ -85,6 +85,8 @@
+     ngx_uint_t                       weight;
+     ngx_uint_t                       max_fails;
+     time_t                           fail_timeout;
++    ngx_uint_t                       max_busy;
++    ngx_str_t                        srun_id;
+ 
+     unsigned                         down:1;
+     unsigned                         backup:1;
+@@ -97,6 +99,8 @@
+ #define NGX_HTTP_UPSTREAM_FAIL_TIMEOUT  0x0008
+ #define NGX_HTTP_UPSTREAM_DOWN          0x0010
+ #define NGX_HTTP_UPSTREAM_BACKUP        0x0020
++#define NGX_HTTP_UPSTREAM_SRUN_ID       0x0040
++#define NGX_HTTP_UPSTREAM_MAX_BUSY      0x0080
+ 
+ 
+ struct ngx_http_upstream_srv_conf_s {
