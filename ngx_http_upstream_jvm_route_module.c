@@ -436,7 +436,7 @@ ngx_http_upstream_init_jvm_route_rr(ngx_conf_t *cf,
 
     /* an upstream implicitly defined by proxy_pass, etc. */
 
-    if (us->port == 0 && us->default_port == 0) {
+    if (us->port == 0) {
         ngx_log_error(NGX_LOG_EMERG, cf->log, 0,
                       "no port in upstream \"%V\" in %s:%ui",
                       &us->host, us->file_name, us->line);
@@ -446,7 +446,7 @@ ngx_http_upstream_init_jvm_route_rr(ngx_conf_t *cf,
     ngx_memzero(&u, sizeof(ngx_url_t));
 
     u.host = us->host;
-    u.port = (in_port_t) (us->port ? us->port : us->default_port);
+    u.port = us->port;
 
     if (ngx_inet_resolve_host(cf->pool, &u) != NGX_OK) {
         if (u.err) {
