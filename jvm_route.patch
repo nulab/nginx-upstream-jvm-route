@@ -1,7 +1,7 @@
-diff -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.11.7/src/http/ngx_http_upstream.c
---- ./src/http/ngx_http_upstream.c	2016-12-21 14:33:15.000000000 -0500
-+++ ../nginx-1.11.7/src/http/ngx_http_upstream.c	2016-12-21 14:26:32.000000000 -0500
-@@ -5530,6 +5530,8 @@
+diff -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.12.0-patch/src/http/ngx_http_upstream.c
+--- ./src/http/ngx_http_upstream.c	2017-04-12 23:46:02.000000000 +0900
++++ ../nginx-1.12.0-patch/src/http/ngx_http_upstream.c	2017-06-07 19:49:44.517986376 +0900
+@@ -5633,6 +5633,8 @@
                                           |NGX_HTTP_UPSTREAM_MAX_CONNS
                                           |NGX_HTTP_UPSTREAM_MAX_FAILS
                                           |NGX_HTTP_UPSTREAM_FAIL_TIMEOUT
@@ -10,7 +10,7 @@ diff -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.11.7/src/http/ngx_http_u
                                           |NGX_HTTP_UPSTREAM_DOWN
                                           |NGX_HTTP_UPSTREAM_BACKUP);
      if (uscf == NULL) {
-@@ -5627,9 +5629,9 @@
+@@ -5730,9 +5732,9 @@
      ngx_http_upstream_srv_conf_t  *uscf = conf;
  
      time_t                       fail_timeout;
@@ -22,7 +22,7 @@ diff -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.11.7/src/http/ngx_http_u
      ngx_uint_t                   i;
      ngx_http_upstream_server_t  *us;
  
-@@ -5645,7 +5647,10 @@
+@@ -5748,7 +5750,10 @@
      weight = 1;
      max_conns = 0;
      max_fails = 1;
@@ -33,7 +33,7 @@ diff -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.11.7/src/http/ngx_http_u
  
      for (i = 2; i < cf->args->nelts; i++) {
  
-@@ -5694,6 +5699,21 @@
+@@ -5797,6 +5802,21 @@
              continue;
          }
  
@@ -55,7 +55,7 @@ diff -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.11.7/src/http/ngx_http_u
          if (ngx_strncmp(value[i].data, "fail_timeout=", 13) == 0) {
  
              if (!(uscf->flags & NGX_HTTP_UPSTREAM_FAIL_TIMEOUT)) {
-@@ -5712,6 +5732,22 @@
+@@ -5815,6 +5835,23 @@
              continue;
          }
  
@@ -75,10 +75,11 @@ diff -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.11.7/src/http/ngx_http_u
 +            continue;
 +        }
 +
++
          if (ngx_strcmp(value[i].data, "backup") == 0) {
  
              if (!(uscf->flags & NGX_HTTP_UPSTREAM_BACKUP)) {
-@@ -5757,7 +5793,9 @@
+@@ -5860,7 +5897,9 @@
      us->weight = weight;
      us->max_conns = max_conns;
      us->max_fails = max_fails;
@@ -88,10 +89,10 @@ diff -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.11.7/src/http/ngx_http_u
  
      return NGX_CONF_OK;
  
-diff -Bbu -ur ./src/http/ngx_http_upstream.h ../nginx-1.11.7/src/http/ngx_http_upstream.h
---- ./src/http/ngx_http_upstream.h	2016-12-21 14:33:15.000000000 -0500
-+++ ../nginx-1.11.7/src/http/ngx_http_upstream.h	2016-12-21 14:30:45.000000000 -0500
-@@ -99,6 +99,8 @@
+diff -Bbu -ur ./src/http/ngx_http_upstream.h ../nginx-1.12.0-patch/src/http/ngx_http_upstream.h
+--- ./src/http/ngx_http_upstream.h	2017-04-12 23:46:02.000000000 +0900
++++ ../nginx-1.12.0-patch/src/http/ngx_http_upstream.h	2017-06-07 19:49:51.286036068 +0900
+@@ -98,6 +98,8 @@
      ngx_uint_t                       max_fails;
      time_t                           fail_timeout;
      ngx_msec_t                       slow_start;
@@ -100,7 +101,7 @@ diff -Bbu -ur ./src/http/ngx_http_upstream.h ../nginx-1.11.7/src/http/ngx_http_u
  
      unsigned                         down:1;
      unsigned                         backup:1;
-@@ -115,6 +117,8 @@
+@@ -114,6 +116,8 @@
  #define NGX_HTTP_UPSTREAM_DOWN          0x0010
  #define NGX_HTTP_UPSTREAM_BACKUP        0x0020
  #define NGX_HTTP_UPSTREAM_MAX_CONNS     0x0100
