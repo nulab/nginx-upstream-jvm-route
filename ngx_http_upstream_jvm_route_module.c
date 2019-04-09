@@ -650,11 +650,11 @@ ngx_http_upstream_jvm_route_get_session_value(ngx_http_request_t *r,
             name = &us->session_cookie;
         }
         u_char *keyword = (u_char *)ngx_palloc(r->pool, name->len + 2);
-        ngx_snprintf(keyword, name->len + 1, "%s=", name->data);
+        ngx_sprintf(keyword, "%V=%Z", name);
 
         uri = &r->unparsed_uri;
 
-        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+        ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "[upstream jvm_route] URI: \"%V\", session_name: \"%V\", keyword:\"%s\"", uri, name, keyword);
 
         start = ngx_strncasestrn(uri->data, keyword, uri->len, name->len + 1);
