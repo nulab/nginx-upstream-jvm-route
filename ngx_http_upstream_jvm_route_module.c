@@ -649,19 +649,18 @@ ngx_http_upstream_jvm_route_get_session_value(ngx_http_request_t *r,
         else {
             name = &us->session_cookie;
         }
-        u_char *keyword = (u_char *)ngx_palloc(r->pool, name->len + 1);
-        ngx_sprintf(keyword, "%s=", name->data);
-        size_t keyword_len = ngx_strlen(keyword);
+        u_char *keyword = (u_char *)ngx_palloc(r->pool, name->len + 2);
+        ngx_snprintf(keyword, name->len + 1, "%s=", name->data);
 
         uri = &r->unparsed_uri;
 
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "[upstream jvm_route] URI: \"%V\", session_name: \"%V\", keyword:\"%s\"", uri, name, keyword);
 
-        start = ngx_strncasestrn(uri->data, keyword, uri->len, keyword_len);
+        start = ngx_strncasestrn(uri->data, keyword, uri->len, name->len + 1);
         ngx_pfree(r->pool, keyword);
         if (start != NULL) {
-            start = start + keyword_len;
+            start = start + name->len + 1;
             while (*start != '=') {
                 if (start >= (uri->data + uri->len)) {
                     ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
