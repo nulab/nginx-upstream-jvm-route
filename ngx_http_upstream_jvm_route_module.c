@@ -659,6 +659,7 @@ ngx_http_upstream_jvm_route_get_session_value(ngx_http_request_t *r,
                 "[upstream jvm_route] URI: \"%V\", session_name: \"%V\", keyword:\"%s\"", uri, name, keyword);
 
         start = ngx_strncasestrn(uri->data, keyword, uri->len, keyword_len);
+        ngx_pfree(r->pool, keyword);
         if (start != NULL) {
             start = start + keyword_len;
             while (*start != '=') {
@@ -684,7 +685,6 @@ ngx_http_upstream_jvm_route_get_session_value(ngx_http_request_t *r,
                 }
             }
         }
-        ngx_pfree(r->pool, keyword);
     }
 
     if (val->len == 0) {
