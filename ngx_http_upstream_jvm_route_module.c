@@ -642,24 +642,30 @@ ngx_http_upstream_jvm_route_get_session_value(ngx_http_request_t *r,
 
     /* session in url */
     if (val->len == 0) {
-
         if (us->session_url.len != 0) {
             name = &us->session_url;
         }
         else {
             name = &us->session_cookie;
         }
-        u_char *keyword = (u_char *)ngx_palloc(r->pool, name->len + 2);
-        ngx_sprintf(keyword, "%V=%Z", name);
-
         uri = &r->unparsed_uri;
 
+        u_char *keyword = (u_char *)ngx_palloc(r->pool, name->len + 3);
+        ngx_sprintf(keyword, "?%V=%Z", name);
         ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "[upstream jvm_route] URI: \"%V\", session_name: \"%V\", keyword:\"%s\"", uri, name, keyword);
-
-        start = ngx_strncasestrn(uri->data, keyword, uri->len, name->len + 1);
+        start = ngx_strncasestrn(uri->data, keyword, uri->len, name->len + 2);
+        if (start == NULL) {
+            ngx_sprintf(keyword, "&%V=%Z", name);
+            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                    "[upstream jvm_route] URI: \"%V\", session_name: \"%V\", keyword:\"%s\"", uri, name, keyword);
+            start = ngx_strncasestrn(uri->data, keyword, uri->len, name->len + 2);
+        }
         ngx_pfree(r->pool, keyword);
+
         if (start != NULL) {
+            start = start + 1;
+            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "start: \"%s\"", start);
             start = start + name->len + 1;
             while (*start != '=') {
                 if (start >= (uri->data + uri->len)) {
