@@ -665,7 +665,7 @@ ngx_http_upstream_jvm_route_get_session_value(ngx_http_request_t *r,
 
         if (start != NULL) {
             start++;
-            ngx_log_debug3(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "start: \"%s\"", start);
+            ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, "start: \"%s\"", start);
             start = start + name->len + 1;
             while (*start != '=') {
                 if (start >= (uri->data + uri->len)) {
