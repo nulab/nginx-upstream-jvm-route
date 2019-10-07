@@ -1,7 +1,7 @@
-diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.15.0-upstream-jvm-route-pached/src/http/ngx_http_upstream.c
---- ./src/http/ngx_http_upstream.c	2018-06-05 09:47:25.000000000 -0400
-+++ ../nginx-1.15.0-upstream-jvm-route-pached/src/http/ngx_http_upstream.c	2018-06-20 13:28:14.000000000 -0400
-@@ -5657,6 +5657,8 @@
+diff -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.16.0-upstream-jvm-route-pached/src/http/ngx_http_upstream.c
+--- ./src/http/ngx_http_upstream.c	2019-08-13 21:51:43.000000000 +0900
++++ ../nginx-1.16.0-upstream-jvm-route-pached/src/http/ngx_http_upstream.c	2019-10-07 19:18:06.033680548 +0900
+@@ -5717,6 +5717,8 @@
                                           |NGX_HTTP_UPSTREAM_MAX_CONNS
                                           |NGX_HTTP_UPSTREAM_MAX_FAILS
                                           |NGX_HTTP_UPSTREAM_FAIL_TIMEOUT
@@ -10,7 +10,7 @@ diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.15.0-upstream-jvm-r
                                           |NGX_HTTP_UPSTREAM_DOWN
                                           |NGX_HTTP_UPSTREAM_BACKUP);
      if (uscf == NULL) {
-@@ -5754,9 +5756,9 @@
+@@ -5814,9 +5816,9 @@
      ngx_http_upstream_srv_conf_t  *uscf = conf;
  
      time_t                       fail_timeout;
@@ -22,7 +22,7 @@ diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.15.0-upstream-jvm-r
      ngx_uint_t                   i;
      ngx_http_upstream_server_t  *us;
  
-@@ -5772,7 +5774,10 @@
+@@ -5832,7 +5834,10 @@
      weight = 1;
      max_conns = 0;
      max_fails = 1;
@@ -33,7 +33,7 @@ diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.15.0-upstream-jvm-r
  
      for (i = 2; i < cf->args->nelts; i++) {
  
-@@ -5821,6 +5826,21 @@
+@@ -5881,6 +5886,21 @@
              continue;
          }
  
@@ -55,7 +55,7 @@ diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.15.0-upstream-jvm-r
          if (ngx_strncmp(value[i].data, "fail_timeout=", 13) == 0) {
  
              if (!(uscf->flags & NGX_HTTP_UPSTREAM_FAIL_TIMEOUT)) {
-@@ -5839,6 +5859,23 @@
+@@ -5899,6 +5919,23 @@
              continue;
          }
  
@@ -79,7 +79,7 @@ diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.15.0-upstream-jvm-r
          if (ngx_strcmp(value[i].data, "backup") == 0) {
  
              if (!(uscf->flags & NGX_HTTP_UPSTREAM_BACKUP)) {
-@@ -5884,7 +5921,9 @@
+@@ -5944,7 +5981,9 @@
      us->weight = weight;
      us->max_conns = max_conns;
      us->max_fails = max_fails;
@@ -89,11 +89,10 @@ diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.c ../nginx-1.15.0-upstream-jvm-r
  
      return NGX_CONF_OK;
  
-Only in ../nginx-1.15.0-upstream-jvm-route-pached/src/http: ngx_http_upstream.c.orig
-diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.h ../nginx-1.15.0-upstream-jvm-route-pached/src/http/ngx_http_upstream.h
---- ./src/http/ngx_http_upstream.h	2018-06-05 09:47:25.000000000 -0400
-+++ ../nginx-1.15.0-upstream-jvm-route-pached/src/http/ngx_http_upstream.h	2018-06-20 13:29:36.000000000 -0400
-@@ -101,6 +101,9 @@
+diff -Bbu -ur ./src/http/ngx_http_upstream.h ../nginx-1.16.0-upstream-jvm-route-pached/src/http/ngx_http_upstream.h
+--- ./src/http/ngx_http_upstream.h	2019-08-13 21:51:43.000000000 +0900
++++ ../nginx-1.16.0-upstream-jvm-route-pached/src/http/ngx_http_upstream.h	2019-10-07 19:37:01.427112100 +0900
+@@ -102,6 +102,9 @@
      ngx_msec_t                       slow_start;
      ngx_uint_t                       down;
  
@@ -103,7 +102,7 @@ diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.h ../nginx-1.15.0-upstream-jvm-r
      unsigned                         backup:1;
  
      NGX_COMPAT_BEGIN(6)
-@@ -115,6 +118,8 @@
+@@ -116,6 +119,8 @@
  #define NGX_HTTP_UPSTREAM_DOWN          0x0010
  #define NGX_HTTP_UPSTREAM_BACKUP        0x0020
  #define NGX_HTTP_UPSTREAM_MAX_CONNS     0x0100
@@ -112,4 +111,3 @@ diff -Bbu -Bbu -ur ./src/http/ngx_http_upstream.h ../nginx-1.15.0-upstream-jvm-r
  
  
  struct ngx_http_upstream_srv_conf_s {
-Only in ../nginx-1.15.0-upstream-jvm-route-pached/src/http: ngx_http_upstream.h.orig
